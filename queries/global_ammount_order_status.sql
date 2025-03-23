@@ -1,6 +1,6 @@
 SELECT 
-    o.order_status AS estado_pedido,
-    COUNT(o.order_id) AS Cantidad
+    o.order_status AS order_status,
+    COUNT(o.order_id) AS Ammount
 FROM
     olist_orders o
 GROUP BY

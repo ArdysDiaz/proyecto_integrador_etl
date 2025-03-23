@@ -1,5 +1,6 @@
 import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
 
 import plotly.express as px
 import seaborn as sns
@@ -196,14 +197,58 @@ def plot_delivery_date_difference(df: DataFrame):
     )
 
 
-def plot_order_amount_per_day_with_holidays(df: DataFrame):
+def plot_order_amount_per_day_with_holidays(df: pd.DataFrame):
     """Plot order amount per day with holidays
 
     Args:
-        df (DataFrame): Dataframe with order amount per day with holidays query result
+        df (DataFrame): DataFrame con columnas:
+            - "date" (datetime): Fecha del pedido
+            - "order_count" (int): Número de pedidos por día
+            - "holiday" (bool): Indica si el día es festivo (True/False)
     """
-    # TODO: Graficar el monto de pedidos por día con los días festivos usando matplotlib.
-    # Marcar los días festivos con líneas verticales.
-    # Sugerencia: usar plt.axvline.
+    # Verificar si df es un DataFrame
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("El argumento df debe ser un DataFrame de pandas.")
 
-    raise NotImplementedError
+    # Verificar si el DataFrame está vacío
+    if df.empty:
+        print("El DataFrame está vacío. No se puede graficar.")
+        return
+    
+    # Verificar que las columnas necesarias existen
+    required_columns = {"date", "order_count", "holiday"}
+    if not required_columns.issubset(df.columns):
+        raise ValueError(f"El DataFrame debe contener las columnas {required_columns}")
+
+    # Convertir la columna de fecha a tipo datetime
+    df["date"] = pd.to_datetime(df["date"])
+
+    # Ordenar el DataFrame por fecha
+    df = df.sort_values(by="date")
+
+    # Crear la figura y los ejes
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    # Graficar la cantidad de pedidos por día
+    ax.plot(df["date"], df["order_count"], marker="o", linestyle="-", label="Pedidos por día")
+
+    # Marcar días festivos con líneas verticales
+    for fecha in df.loc[df["holiday"], "date"]:
+        ax.axvline(fecha, color="red", linestyle="--", alpha=0.5, label="Día festivo")
+
+    # Configurar etiquetas y título
+    ax.set_xlabel("Fecha")
+    ax.set_ylabel("Cantidad de pedidos")
+    ax.set_title("Cantidad de pedidos por día con días festivos")
+
+    # Rotar las etiquetas del eje X
+    plt.xticks(rotation=45)
+
+    # Agregar leyenda
+    ax.legend()
+
+    # Mostrar gráfico
+    plt.show()
+
+
+
